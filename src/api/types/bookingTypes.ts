@@ -12,6 +12,8 @@ export interface BookingPayload {
     additionalneeds?: string;
 }
 
+export type BookingResponse = BookingPayload;
+
 export type CreateBookingRequest = BookingPayload;
 
 export type UpdateBookingRequest = BookingPayload;

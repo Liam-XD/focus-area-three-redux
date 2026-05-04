@@ -141,3 +141,6 @@ TBD
 ## Conclusion
 
 TBD
+
+Add response typings to client methods for stronger assertions.
+Add an auth fixture/context later so token handling is reusable for BDD steps.
