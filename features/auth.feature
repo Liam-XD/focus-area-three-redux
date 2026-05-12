@@ -19,7 +19,7 @@ Feature: Auth API checks
     When I request an auth token
     Then the response status should be 200
     And the response should not contain a token
-    And the auth failure reason should be Bad credentials
+    And the auth failure reason should be "Bad credentials"
     Examples:
     | username | password |
     | "unknown" | "password321" |

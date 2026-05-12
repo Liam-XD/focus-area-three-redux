@@ -8,7 +8,10 @@
      "bdd:gen": "bddgen",
      "test:bdd": "npm run bdd:gen && playwright test",
      "test:bdd:ui": "npm run bdd:gen && playwright test --ui",
-     "test:bdd:tags": "npm run bdd:gen && playwright test --grep \"@smoke\""
+     "test:bdd:smoke": "npm run bdd:gen && playwright test --grep \"@smoke\"",
+     "test:bdd:auth": "npm run bdd:gen && playwright test --grep \"@auth\"",
+     "test:bdd:booking": "npm run bdd:gen && playwright test --grep \"@booking\"",
+     "test:bdd:negative": "npm run bdd:gen && playwright test --grep \"@negative\""
   },
   "keywords": [],
   "author": "",
