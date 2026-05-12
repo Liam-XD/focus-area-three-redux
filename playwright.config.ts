@@ -1,4 +1,5 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
+import { defineBddConfig } from 'playwright-bdd';
 
 /**
  * Read environment variables from file.
@@ -6,13 +7,29 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import dotenv from 'dotenv';
 import path from 'path';
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+const testDir = defineBddConfig({
+  features: 'features/**/*.feature',
+  steps: 'tests/steps/**/*.ts',
+})
+
+const dotenvPath = path.resolve(__dirname, '.env');
+const dotenvResult = dotenv.config({ path: dotenvPath, quiet: true });
+
+if (process.env.DEBUG_ENV === '1') {
+  if (dotenvResult.error) {
+    console.warn(`[env] Failed to load ${dotenvPath}:`, dotenvResult.error.message);
+  } else {
+    const loadedKeys = Object.keys(dotenvResult.parsed ?? {});
+    console.info(`[env] Loaded ${loadedKeys.length} vars from ${dotenvPath}`);
+  }
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -33,42 +50,42 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+  // projects: [
+  //   {
+  //     name: 'chromium',
+  //     use: { ...devices['Desktop Chrome'] },
+  //   },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+  //   {
+  //     name: 'firefox',
+  //     use: { ...devices['Desktop Firefox'] },
+  //   },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+  //   {
+  //     name: 'webkit',
+  //     use: { ...devices['Desktop Safari'] },
+  //   },
 
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+  /* Test against mobile viewports. */
+  // {
+  //   name: 'Mobile Chrome',
+  //   use: { ...devices['Pixel 5'] },
+  // },
+  // {
+  //   name: 'Mobile Safari',
+  //   use: { ...devices['iPhone 12'] },
+  // },
 
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
-  ],
+  /* Test against branded browsers. */
+  // {
+  //   name: 'Microsoft Edge',
+  //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+  // },
+  // {
+  //   name: 'Google Chrome',
+  //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+  // },
+  // ],
 
   /* Run your local dev server before starting the tests */
   // webServer: {

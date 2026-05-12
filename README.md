@@ -91,10 +91,22 @@ TBD
 Run the following command to execute all Cucumber feature tests:
 
 ```bash
-TBD
+npx playwright test
 ```
 
 Test results will be displayed in the terminal. A report (e.g., HTML or JSON) will be generated in the reports/ directory.
+
+### Debug Environment Loading
+
+Environment variable loading from `.env` is quiet by default to reduce terminal noise.
+
+Use the following command when troubleshooting missing or misnamed env variables:
+
+```bash
+DEBUG_ENV=1 npx playwright test
+```
+
+This prints a concise summary of how many variables were loaded, or an error if `.env` could not be read.
 
 ### Specific Feature File
 
