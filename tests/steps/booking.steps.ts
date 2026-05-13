@@ -7,16 +7,41 @@ import { BookingResponse, CreateBookingResponse } from '../../src/api/types/book
 import { createBookingPayload, patchNamePayload, updateBookingPayload } from '../../src/test-data/factories/bookingFactory';
 import { HttpState } from './support/httpState';
 
-const { Before, Given, When, Then } = createBdd();
+const { Before, After, Given, When, Then } = createBdd();
 
 const httpState = new HttpState();
 let authToken: string | undefined;
 let createdBookingId: number | undefined;
 
+// Resetting shared state before each scenario
 Before(async ({ }) => {
     httpState.reset();
     authToken = undefined;
     createdBookingId = undefined;
+});
+
+// Automatically acquiring auth token for scenarios that require write access
+Before({ tags: '@update or @patch or @delete' }, async ({ request }) => {
+    const authApi = new AuthApi(request);
+    httpState.setResponse(await authApi.createToken());
+    expect(httpState.getResponse().status()).toBe(200);
+    const body = await httpState.readBody<AuthTokenResponse>();
+    expect(body.token).toBeTruthy();
+    authToken = body.token;
+    httpState.reset();
+});
+
+// Cleanup - Deleting created bookings after each scenario
+After(async ({ request }) => {
+    if (authToken && createdBookingId) {
+        try {
+            const bookingApi = new BookingApi(request); // Creates a new instance of BookingApi for cleanup
+            await bookingApi.deleteBooking(createdBookingId, authToken); // Attempt to delete the created booking
+            console.log(`Cleaned up booking ID: ${createdBookingId}`);
+        } catch (error) {
+            console.log(`Failed to cleanup booking ID: ${createdBookingId}`);
+        }
+    }
 });
 
 function getCreatedBookingId(): number {
@@ -37,15 +62,6 @@ async function createBookingAndStoreId(request: APIRequestContext) {
     expect(body.bookingid).toBeTruthy();
     createdBookingId = body.bookingid;
 }
-
-Given('I have a valid auth token', async ({ request }) => {
-    const authApi = new AuthApi(request);
-    httpState.setResponse(await authApi.createToken());
-    expect(httpState.getResponse().status()).toBe(200);
-    const body = await httpState.readBody<AuthTokenResponse>();
-    expect(body.token).toBeTruthy();
-    authToken = body.token;
-});
 
 Given('I created a booking with the default booking payload', async ({ request }) => {
     await createBookingAndStoreId(request);
