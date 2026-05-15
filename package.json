@@ -14,6 +14,8 @@
     "test:bdd:auth": "npm run bdd:gen && playwright test --grep \"@auth\"",
     "test:bdd:booking": "npm run bdd:gen && playwright test --grep \"@booking\"",
     "test:bdd:negative": "npm run bdd:gen && playwright test --grep \"@negative\"",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
     "allure:report": "npm run allure:generate && npm run allure:open",
     "html:report": "npx playwright show-report"
   },
