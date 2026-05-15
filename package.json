@@ -4,14 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-     "test": "playwright test",
-     "bdd:gen": "bddgen",
-     "test:bdd": "npm run bdd:gen && playwright test",
-     "test:bdd:ui": "npm run bdd:gen && playwright test --ui",
-     "test:bdd:smoke": "npm run bdd:gen && playwright test --grep \"@smoke\"",
-     "test:bdd:auth": "npm run bdd:gen && playwright test --grep \"@auth\"",
-     "test:bdd:booking": "npm run bdd:gen && playwright test --grep \"@booking\"",
-     "test:bdd:negative": "npm run bdd:gen && playwright test --grep \"@negative\""
+    "test": "playwright test",
+    "bdd:gen": "bddgen",
+    "test:bdd": "npm run bdd:gen && playwright test",
+    "test:bdd:ui": "npm run bdd:gen && playwright test --ui",
+    "test:bdd:feature": "npm run bdd:gen && npx playwright test",
+    "test:bdd:scenario": "npm run bdd:gen && npx playwright test --grep",
+    "test:bdd:smoke": "npm run bdd:gen && playwright test --grep \"@smoke\"",
+    "test:bdd:auth": "npm run bdd:gen && playwright test --grep \"@auth\"",
+    "test:bdd:booking": "npm run bdd:gen && playwright test --grep \"@booking\"",
+    "test:bdd:negative": "npm run bdd:gen && playwright test --grep \"@negative\"",
+    "allure:report": "npm run allure:generate && npm run allure:open",
+    "html:report": "npx playwright show-report"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +23,8 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.0",
+    "allure-commandline": "^2.41.0",
+    "allure-playwright": "^3.8.0",
     "dotenv": "^17.4.2",
     "playwright-bdd": "^8.5.1"
   }

@@ -18,7 +18,7 @@ Before(async ({ }) => {
 });
 
 
-Given('the auth API endpoint is available', async ({ request }) => {
+Given('the auth API endpoint is available', async ({ }) => {
     // This step is decorative since API availability is tested in next steps.
 });
 

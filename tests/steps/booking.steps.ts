@@ -1,34 +1,30 @@
 import { expect, APIRequestContext } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
-import { AuthApi } from '../../src/api/client/authApi';
 import { BookingApi } from '../../src/api/client/bookingApi';
-import { AuthTokenResponse } from '../../src/api/types/authTypes';
 import { BookingResponse, CreateBookingResponse } from '../../src/api/types/bookingTypes';
 import { createBookingPayload, patchNamePayload, updateBookingPayload } from '../../src/test-data/factories/bookingFactory';
 import { HttpState } from './support/httpState';
+import { AuthState } from './support/authState';
 
 const { Before, After, Given, When, Then } = createBdd();
 
 const httpState = new HttpState();
+const authState = new AuthState();
 let authToken: string | undefined;
 let createdBookingId: number | undefined;
+let createdBookingIds: number[] = [];
 
 // Resetting shared state before each scenario
 Before(async ({ }) => {
     httpState.reset();
     authToken = undefined;
     createdBookingId = undefined;
+    createdBookingIds = [];
 });
 
 // Automatically acquiring auth token for scenarios that require write access
 Before({ tags: '@update or @patch or @delete' }, async ({ request }) => {
-    const authApi = new AuthApi(request);
-    httpState.setResponse(await authApi.createToken());
-    expect(httpState.getResponse().status()).toBe(200);
-    const body = await httpState.readBody<AuthTokenResponse>();
-    expect(body.token).toBeTruthy();
-    authToken = body.token;
-    httpState.reset();
+    authToken = await authState.acquireAuthToken(request);
 });
 
 // Cleanup - Deleting created bookings after each scenario
@@ -40,6 +36,19 @@ After(async ({ request }) => {
             console.log(`Cleaned up booking ID: ${createdBookingId}`);
         } catch (error) {
             console.log(`Failed to cleanup booking ID: ${createdBookingId}`);
+        }
+    }
+
+    if (createdBookingIds.length > 0 && !authToken) {
+        try {
+            authToken = await authState.acquireAuthToken(request);
+            const bookingApi = new BookingApi(request); // Creates a new instance of BookingApi for cleanup
+            for (const bookingId of createdBookingIds) {
+                await bookingApi.deleteBooking(bookingId, authToken); // Attempt to delete each created booking
+                console.log(`Cleaned up booking ID: ${bookingId}`);
+            }
+        } catch (error) {
+            console.log(`Failed to cleanup one or more booking IDs: ${createdBookingIds.join(', ')}`);
         }
     }
 });
@@ -63,8 +72,25 @@ async function createBookingAndStoreId(request: APIRequestContext) {
     createdBookingId = body.bookingid;
 }
 
+async function createMultipleBookingsAndStoreIds(request: APIRequestContext, bookingData: Array<{ firstname: string; lastname: string }>) {
+    const bookingApi = new BookingApi(request);
+    for (const data of bookingData) {
+        const payload = { ...createBookingPayload(), ...data };
+        httpState.setResponse(await bookingApi.createBooking(payload));
+        const body = await httpState.readBody<CreateBookingResponse>();
+        expect(body.bookingid).toBeTruthy();
+        createdBookingIds.push(body.bookingid);
+    }
+}
+
 Given('I created a booking with the default booking payload', async ({ request }) => {
     await createBookingAndStoreId(request);
+    expect(httpState.getResponse().status()).toBe(200);
+});
+
+Given(`I have created bookings with the following names:`, async ({ request }, table: { hashes: () => Array<{ firstname: string; lastname: string }> }) => {
+    const bookingData = table.hashes(); //Hashes converts the table data into an array of objects with keys matching the column headers
+    await createMultipleBookingsAndStoreIds(request, bookingData);
     expect(httpState.getResponse().status()).toBe(200);
 });
 
@@ -103,6 +129,11 @@ When('I retrieve the deleted booking', async ({ request }) => {
     httpState.setResponse(await bookingApi.getBooking(getCreatedBookingId()));
 });
 
+When('I retrieve booking ids filtered by lastname {string}', async ({ request }, lastName: string) => {
+    const bookingApi = new BookingApi(request);
+    httpState.setResponse(await bookingApi.getBookingIds({ lastname: lastName }));
+});
+
 Then('the booking response status should be {int}', async ({ }, statusCode: number) => {
     expect(httpState.getResponse().status()).toBe(statusCode);
 });
@@ -130,4 +161,17 @@ Then('the booking last name should be {string}', async ({ }, lastName: string) =
 Then('the booking additional needs should be {string}', async ({ }, additionalNeeds: string) => {
     const body = await httpState.readBody<BookingResponse>();
     expect(body.additionalneeds).toBe(additionalNeeds);
+});
+
+Then('every retrieved booking should have lastname {string}', async ({ request }, expectedLastName: string) => {
+    const ids = await httpState.readBody<Array<{ bookingid: number }>>();
+    expect(ids.length).toBeGreaterThan(0);
+
+    const bookingApi = new BookingApi(request);
+    for (const item of ids) {
+        const response = await bookingApi.getBooking(item.bookingid);
+        expect(response.status()).toBe(200);
+        const booking = (await response.json()) as BookingResponse;
+        expect(booking.lastname).toBe(expectedLastName);
+    }
 });

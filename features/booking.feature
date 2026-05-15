@@ -42,3 +42,13 @@ Feature: Booking API flow
     And I delete the booking
     When I retrieve the deleted booking
     Then the booking response status should be 404
+  
+  @booking @filter
+Scenario: Retrieve bookings by last name
+  Given I have created bookings with the following names:
+    | firstname | lastname |
+    | Alex      | Brown    |
+    | Jamie     | Brown    |
+    | Taylor    | Smith    |
+  When I retrieve booking ids filtered by lastname "Brown"
+  Then every retrieved booking should have lastname "Brown"
