@@ -10,7 +10,7 @@ For this project, I have chosen to demonstrate API testing using the [Restful Bo
 The Restful Booker API is, by name, RESTful and uses standard HTTP methods such as GET, POST, PUT, PATCH and DELETE.
 The [API documentation can be accessed here](https://restful-booker.herokuapp.com/apidoc/index.html).
 
-I will utilise these endpoints to authorise, create, update and delete bookings as part of the test scenarios.
+I will utilise the endpoints within the documentation to authenticate and then to authorise, create, update and delete bookings as part of the test scenarios.
 
 ## Table of Contents
 
