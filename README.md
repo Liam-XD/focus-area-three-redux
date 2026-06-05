@@ -129,6 +129,8 @@ npm run test:bdd:smoke
 npm run test:bdd:negative
 ```
 
+Note: There are further special tags that can be utilised which are documented in the playwright-bdd documentation [here](https://vitalets.github.io/playwright-bdd/#/writing-features/special-tags).
+
 ### Debug Environment Loading
 
 Environment variable loading from `.env` is quiet by default to reduce terminal noise.
@@ -164,6 +166,8 @@ focus3/
 ├── README.md
 ├── package.json
 ├── playwright.config.ts
+├── types/
+│   └── playwright-bdd.d.ts
 ├── features/
 │   ├── auth.feature
 │   └── booking.feature
@@ -184,11 +188,11 @@ focus3/
 │   └── utils.ts
 └── tests/
     └── steps/
-        ├── auth.steps.ts
-        ├── booking.steps.ts
-        └── support/
-            ├── authState.ts
-            └── httpState.ts
+    ├── auth.steps.ts
+    ├── booking.steps.ts
+    └── support/
+      ├── authState.ts
+      └── httpState.ts
 ```
 
 ## Future Enhancements
