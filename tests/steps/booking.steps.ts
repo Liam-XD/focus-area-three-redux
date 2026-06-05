@@ -23,12 +23,12 @@ Before(async ({ }) => {
 });
 
 // Automatically acquiring auth token for scenarios that require write access
-Before({ tags: '@update or @patch or @delete' }, async ({ request }: any) => {
+Before({ tags: '@update or @patch or @delete' }, async ({ request }) => {
     authToken = await authState.acquireAuthToken(request);
 });
 
 // Cleanup - Deleting created bookings after each scenario
-After(async ({ request }: any) => {
+After(async ({ request }) => {
     // If a single booking was created and an auth token is available, attempt to clean it up
     if (authToken && createdBookingId) {
         try {
@@ -88,53 +88,53 @@ const createMultipleBookingsAndStoreIds = async (
     }
 };
 
-Given('I created a booking with the default booking payload', async ({ request }: any) => {
+Given('I created a booking with the default booking payload', async ({ request }) => {
     await createBookingAndStoreId(request);
     expect(httpState.getResponse().status()).toBe(200);
 });
 
-Given(`I have created bookings with the following names:`, async ({ request }: any, table: { hashes: () => Array<{ firstname: string; lastname: string }> }) => {
+Given(`I have created bookings with the following names:`, async ({ request }, table: { hashes: () => Array<{ firstname: string; lastname: string }> }) => {
     const bookingData = table.hashes(); //Hashes converts the table data into an array of objects with keys matching the column headers
     await createMultipleBookingsAndStoreIds(request, bookingData);
     expect(httpState.getResponse().status()).toBe(200);
 });
 
-Given('I delete the booking', async ({ request }: any) => {
+Given('I delete the booking', async ({ request }) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.deleteBooking(getCreatedBookingId(), getAuthToken()));
     expect(httpState.getResponse().status()).toBe(201);
 });
 
-When('I create a booking with the default booking payload', async ({ request }: any) => {
+When('I create a booking with the default booking payload', async ({ request }) => {
     await createBookingAndStoreId(request);
 });
 
-When('I retrieve the created booking', async ({ request }: any) => {
+When('I retrieve the created booking', async ({ request }) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.getBooking(getCreatedBookingId()));
 });
 
-When('I update the created booking with the update booking payload', async ({ request }: any) => {
+When('I update the created booking with the update booking payload', async ({ request }) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.updateBooking(getCreatedBookingId(), updateBookingPayload(), getAuthToken()));
 });
 
-When('I patch the created booking with the patch name payload', async ({ request }: any) => {
+When('I patch the created booking with the patch name payload', async ({ request }) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.patchBooking(getCreatedBookingId(), patchNamePayload(), getAuthToken()));
 });
 
-When('I delete the created booking', async ({ request }: any) => {
+When('I delete the created booking', async ({ request }) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.deleteBooking(getCreatedBookingId(), getAuthToken()));
 });
 
-When('I retrieve the deleted booking', async ({ request }: any) => {
+When('I retrieve the deleted booking', async ({ request }) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.getBooking(getCreatedBookingId()));
 });
 
-When('I retrieve booking ids filtered by lastname {string}', async ({ request }: any, lastName: string) => {
+When('I retrieve booking ids filtered by lastname {string}', async ({ request }, lastName: string) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.getBookingIds({ lastname: lastName }));
 });
@@ -168,7 +168,7 @@ Then('the booking additional needs should be {string}', async ({ }, additionalNe
     expect(body.additionalneeds).toBe(additionalNeeds);
 });
 
-Then('every retrieved booking should have lastname {string}', async ({ request }: any, expectedLastName: string) => {
+Then('every retrieved booking should have lastname {string}', async ({ request }, expectedLastName: string) => {
     const ids = await httpState.readBody<Array<{ bookingid: number }>>();
     expect(ids.length).toBeGreaterThan(0);
 

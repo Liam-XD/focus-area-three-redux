@@ -166,8 +166,6 @@ focus3/
 ├── README.md                       // Project documentation and instructions
 ├── package.json                    // Project metadata and dependencies
 ├── playwright.config.ts            // Playwright configuration file
-├── types/
-│   └── playwright-bdd.d.ts         // TypeScript declaration for playwright-bdd module
 ├── features/
 │   ├── auth.feature                // Gherkin feature file for authentication tests
 │   └── booking.feature             // Gherkin feature file for booking tests

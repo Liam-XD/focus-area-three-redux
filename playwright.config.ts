@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import { defineBddConfig } from 'playwright-bdd';
+import { defineBddConfig } from 'playwright-bdd'; // Importing the BDD configuration helper from playwright-bdd. Returning an error because the module is not found, but it is installed in the project. This may be due to a missing type declaration file for the module or an issue with the module resolution in TypeScript.
 
 /**
  * Read environment variables from file.
