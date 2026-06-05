@@ -41,4 +41,13 @@ export class BookingApi {
             }
         });
     }
+
+    async getBookingIds(filter?: { lastname?: string }) {
+        const queryParams = new URLSearchParams();
+        if (filter?.lastname) {
+            queryParams.append('lastname', filter.lastname);
+        }
+        const url = `${env.baseUrl}${ENDPOINTS.BOOKING}?${queryParams.toString()}`;
+        return this.request.get(url);
+    }
 }
