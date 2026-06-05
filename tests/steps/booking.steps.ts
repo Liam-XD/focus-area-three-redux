@@ -23,12 +23,13 @@ Before(async ({ }) => {
 });
 
 // Automatically acquiring auth token for scenarios that require write access
-Before({ tags: '@update or @patch or @delete' }, async ({ request }) => {
+Before({ tags: '@update or @patch or @delete' }, async ({ request }: any) => {
     authToken = await authState.acquireAuthToken(request);
 });
 
 // Cleanup - Deleting created bookings after each scenario
-After(async ({ request }) => {
+After(async ({ request }: any) => {
+    // If a single booking was created and an auth token is available, attempt to clean it up
     if (authToken && createdBookingId) {
         try {
             const bookingApi = new BookingApi(request); // Creates a new instance of BookingApi for cleanup
@@ -39,6 +40,7 @@ After(async ({ request }) => {
         }
     }
 
+    // If multiple bookings were created and an auth token is available, attempt to clean them all up
     if (createdBookingIds.length > 0 && !authToken) {
         try {
             authToken = await authState.acquireAuthToken(request);
@@ -53,26 +55,29 @@ After(async ({ request }) => {
     }
 });
 
-function getCreatedBookingId(): number {
+const getCreatedBookingId = (): number => {
     expect(createdBookingId).toBeDefined();
     return createdBookingId as number;
-}
+};
 
-function getAuthToken(): string {
+const getAuthToken = (): string => {
     expect(authToken).toBeDefined();
     return authToken as string;
-}
+};
 
-async function createBookingAndStoreId(request: APIRequestContext) {
+const createBookingAndStoreId = async (request: APIRequestContext) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.createBooking(createBookingPayload()));
 
     const body = await httpState.readBody<CreateBookingResponse>();
     expect(body.bookingid).toBeTruthy();
     createdBookingId = body.bookingid;
-}
+};
 
-async function createMultipleBookingsAndStoreIds(request: APIRequestContext, bookingData: Array<{ firstname: string; lastname: string }>) {
+const createMultipleBookingsAndStoreIds = async (
+    request: APIRequestContext,
+    bookingData: Array<{ firstname: string; lastname: string }>,
+) => {
     const bookingApi = new BookingApi(request);
     for (const data of bookingData) {
         const payload = { ...createBookingPayload(), ...data };
@@ -81,55 +86,55 @@ async function createMultipleBookingsAndStoreIds(request: APIRequestContext, boo
         expect(body.bookingid).toBeTruthy();
         createdBookingIds.push(body.bookingid);
     }
-}
+};
 
-Given('I created a booking with the default booking payload', async ({ request }) => {
+Given('I created a booking with the default booking payload', async ({ request }: any) => {
     await createBookingAndStoreId(request);
     expect(httpState.getResponse().status()).toBe(200);
 });
 
-Given(`I have created bookings with the following names:`, async ({ request }, table: { hashes: () => Array<{ firstname: string; lastname: string }> }) => {
+Given(`I have created bookings with the following names:`, async ({ request }: any, table: { hashes: () => Array<{ firstname: string; lastname: string }> }) => {
     const bookingData = table.hashes(); //Hashes converts the table data into an array of objects with keys matching the column headers
     await createMultipleBookingsAndStoreIds(request, bookingData);
     expect(httpState.getResponse().status()).toBe(200);
 });
 
-Given('I delete the booking', async ({ request }) => {
+Given('I delete the booking', async ({ request }: any) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.deleteBooking(getCreatedBookingId(), getAuthToken()));
     expect(httpState.getResponse().status()).toBe(201);
 });
 
-When('I create a booking with the default booking payload', async ({ request }) => {
+When('I create a booking with the default booking payload', async ({ request }: any) => {
     await createBookingAndStoreId(request);
 });
 
-When('I retrieve the created booking', async ({ request }) => {
+When('I retrieve the created booking', async ({ request }: any) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.getBooking(getCreatedBookingId()));
 });
 
-When('I update the created booking with the update booking payload', async ({ request }) => {
+When('I update the created booking with the update booking payload', async ({ request }: any) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.updateBooking(getCreatedBookingId(), updateBookingPayload(), getAuthToken()));
 });
 
-When('I patch the created booking with the patch name payload', async ({ request }) => {
+When('I patch the created booking with the patch name payload', async ({ request }: any) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.patchBooking(getCreatedBookingId(), patchNamePayload(), getAuthToken()));
 });
 
-When('I delete the created booking', async ({ request }) => {
+When('I delete the created booking', async ({ request }: any) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.deleteBooking(getCreatedBookingId(), getAuthToken()));
 });
 
-When('I retrieve the deleted booking', async ({ request }) => {
+When('I retrieve the deleted booking', async ({ request }: any) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.getBooking(getCreatedBookingId()));
 });
 
-When('I retrieve booking ids filtered by lastname {string}', async ({ request }, lastName: string) => {
+When('I retrieve booking ids filtered by lastname {string}', async ({ request }: any, lastName: string) => {
     const bookingApi = new BookingApi(request);
     httpState.setResponse(await bookingApi.getBookingIds({ lastname: lastName }));
 });
@@ -163,7 +168,7 @@ Then('the booking additional needs should be {string}', async ({ }, additionalNe
     expect(body.additionalneeds).toBe(additionalNeeds);
 });
 
-Then('every retrieved booking should have lastname {string}', async ({ request }, expectedLastName: string) => {
+Then('every retrieved booking should have lastname {string}', async ({ request }: any, expectedLastName: string) => {
     const ids = await httpState.readBody<Array<{ bookingid: number }>>();
     expect(ids.length).toBeGreaterThan(0);
 

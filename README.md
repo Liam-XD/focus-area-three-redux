@@ -163,36 +163,36 @@ npm run allure:report
 
 ```text
 focus3/
-├── README.md
-├── package.json
-├── playwright.config.ts
+├── README.md                       // Project documentation and instructions
+├── package.json                    // Project metadata and dependencies
+├── playwright.config.ts            // Playwright configuration file
 ├── types/
-│   └── playwright-bdd.d.ts
+│   └── playwright-bdd.d.ts         // TypeScript declaration for playwright-bdd module
 ├── features/
-│   ├── auth.feature
-│   └── booking.feature
+│   ├── auth.feature                // Gherkin feature file for authentication tests
+│   └── booking.feature             // Gherkin feature file for booking tests
 ├── src/
 │   ├── api/
 │   │   ├── client/
-│   │   │   ├── authApi.ts
-│   │   │   └── bookingApi.ts
+│   │   │   ├── authApi.ts          // API client for authentication-related requests
+│   │   │   └── bookingApi.ts       // API client for booking-related requests
 │   │   └── types/
-│   │       ├── authTypes.ts
-│   │       └── bookingTypes.ts
+│   │       ├── authTypes.ts        // Type definitions for authentication-related data structures
+│   │       └── bookingTypes.ts     // Type definitions for booking-related data structures
 │   ├── config/
-│   │   ├── constants.ts
-│   │   └── env.ts
+│   │   ├── constants.ts            // Project-wide constants
+│   │   └── env.ts                  // Environment variable loading and management
 │   ├── test-data/
 │   │   └── factories/
-│   │       └── bookingFactory.ts
+│   │       └── bookingFactory.ts   // Factory for generating test data for bookings
 │   └── utils.ts
 └── tests/
     └── steps/
-    ├── auth.steps.ts
-    ├── booking.steps.ts
+    ├── auth.steps.ts               // Step definitions for authentication-related test scenarios
+    ├── booking.steps.ts            // Step definitions for booking-related test scenarios
     └── support/
-      ├── authState.ts
-      └── httpState.ts
+      ├── authState.ts              // State management for authentication during tests
+      └── httpState.ts              // State management for HTTP requests and responses during tests
 ```
 
 ## Future Enhancements

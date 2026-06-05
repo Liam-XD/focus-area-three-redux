@@ -1,3 +1,5 @@
+// This file defines TypeScript interfaces for the booking-related API requests and responses.
+
 export interface BookingDates {
     checkin: string;
     checkout: string;

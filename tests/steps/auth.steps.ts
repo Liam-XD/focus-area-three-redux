@@ -36,12 +36,12 @@ Given(
     }
 );
 
-When('I call the API health endpoint', async ({ request }) => {
+When('I call the API health endpoint', async ({ request }: any) => {
     const authApi = new AuthApi(request);
     httpState.setResponse(await authApi.ping());
 });
 
-When('I request an auth token', async ({ request }) => {
+When('I request an auth token', async ({ request }: any) => {
     const authApi = new AuthApi(request);
     httpState.setResponse(await authApi.createToken(usernameOverride, passwordOverride));
 });

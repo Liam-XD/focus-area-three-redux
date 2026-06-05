@@ -3,6 +3,7 @@ import { env } from '../../config/env';
 import { ENDPOINTS } from '../../config/constants';
 import { CreateBookingRequest, UpdateBookingRequest, PatchBookingRequest } from '../types/bookingTypes';
 
+// This class provides methods to interact with the booking API, including creating, retrieving, updating, patching, and deleting bookings.
 export class BookingApi {
     constructor(private request: APIRequestContext) { }
 

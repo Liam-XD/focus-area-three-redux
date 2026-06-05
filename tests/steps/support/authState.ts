@@ -18,7 +18,7 @@ export class AuthState {
         expect(body.token).toBeTruthy();
 
         this.authToken = body.token;
-        this.httpState.reset();
+        this.httpState.reset(); // Clearing the response after extracting the token
 
         return this.authToken as string;
     }

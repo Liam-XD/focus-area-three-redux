@@ -1,3 +1,5 @@
+// This file is responsible for loading and validating environment variables required for the application to function correctly. It ensures that all necessary configuration values are present before the application starts.
+
 const getEnv = (name: string): string => {
     const value = process.env[name];
 
